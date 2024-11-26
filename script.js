@@ -6,7 +6,7 @@ socket.on('connect', () => {
     console.log('Connected to the backend!');
 });
 
-// Listen for incoming messages and update the chat window
+// Listen for incoming messages from the backend
 socket.on('receive-message', (message) => {
     console.log('Message received:', message);
 
@@ -32,10 +32,7 @@ function sendMessage() {
 
     // If the message isn't empty, send it via Socket.IO
     if (message.trim() !== "") {
-        // Emit the message to the backend
-        socket.emit('send-message', message);
-        
-        // Display the message in the chat window
+        // Display the message immediately in the chat window (only on the sending device)
         const chatBox = document.getElementById('chatBox');
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', 'sent');
@@ -44,6 +41,9 @@ function sendMessage() {
         
         // Scroll the chat box to the bottom
         chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Emit the message to the backend (this will broadcast to the other device)
+        socket.emit('send-message', message);
 
         // Clear the input field after sending the message
         messageInput.value = "";
