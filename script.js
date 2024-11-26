@@ -1,9 +1,11 @@
-// DOM Elements
+// Connect to the backend using Socket.IO
+const socket = io("https://chat-back-04cv.onrender.com"); // Replace with your backend URL
+
 const chatBox = document.getElementById('chat-box');
 const chatInput = document.getElementById('chat-input');
 const sendButton = document.getElementById('send-btn');
 
-// Utility function to add a message
+// Add messages to the chat box
 function addMessage(content, isSent = true) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', isSent ? 'sent' : 'received');
@@ -12,18 +14,20 @@ function addMessage(content, isSent = true) {
     chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
 }
 
-// Handle sending a message
+// Send message to the server
 function sendMessage() {
     const message = chatInput.value.trim();
     if (message) {
-        addMessage(message, true); // User's message
+        addMessage(message, true); // Show the sent message
+        socket.emit("send-message", message); // Send message to the server
         chatInput.value = ''; // Clear input
-        // Simulate a response after 1 second
-        setTimeout(() => {
-            addMessage(" I've received your message!", false);
-        }, 1000);
     }
 }
+
+// Listen for messages from the server
+socket.on("receive-message", (message) => {
+    addMessage(message, false); // Display received message
+});
 
 // Send message on button click
 sendButton.addEventListener('click', sendMessage);
